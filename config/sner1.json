@@ -1,0 +1,90 @@
+{
+    "checkpoint_name": "sner1", 
+    "gpu": "auto", 
+    "update": "Nadam", 
+    "lr": 0.01, 
+    "lr_decay": -1.0,
+    "burn_in": 2,
+    "burn_in_ratio": 0.2,
+    "clip": 1,
+    "batch_size": 32,
+    "epoch": 200,
+    "strEncoder": {
+        "lm": {
+            "lm_dict": "./dict/char_dict.json"
+        },
+        "we1": {
+            "emb_path": "./embed/embed.txt",
+            "embed_seperator": " "
+        },
+        "we2": {
+            "emb_path": "./embed/cc.ar.300.vec",
+            "embed_seperator": " "
+        },
+        "label": {
+            "generate_label_dict": false,
+            "label_dict": "./dict/label_dict.json",
+            "convert_to_iobes": false
+        },
+        "ws": {},
+        "ori": {}
+    },
+    "spEncoder": {
+        "lm": {
+            "input": "lm",
+            "c_num": 257, 
+            "c_dim_lm": 128, 
+            "lm_dict": "./dict/char_dict.json",
+            "frnn_layer_num": 1, 
+            "frnn_emb_dim": 128,
+            "frnn_hid_dim": 2048,
+            "frnn_unit": "lstm",
+            "flm_weight": "./embed/flm.th",
+            "brnn_layer_num": 1,
+            "brnn_emb_dim": 128,
+            "brnn_hid_dim": 2048,
+            "brnn_unit": "lstm",
+            "blm_weight": "./embed/blm.th",
+            "emb_project_to": 50,
+            "lm_droprate": 0.2,
+            "droprate": 0.5,
+            "word_droprate": 0.1
+        },
+        "we1": {
+            "input": "we1",
+            "emb_path": "./embed/embed.txt",
+            "embed_seperator": " ",
+            "word_droprate": 0.1
+        },
+        "we2": {
+            "input": "we2",
+            "emb_path": "./embed/cc.ar.300.vec",
+            "embed_seperator": " ",
+            "word_droprate": 0.1,
+            "emb_project_to": 100,
+            "droprate": 0.5
+        },
+        "ws": {
+            "input": "ws",
+            "word_droprate": 0.1,
+            "emb_dim": 50
+        }
+    },
+    "denEncoder": {
+        "word_droprate": 0.0,
+        "rnn_layer": 1,
+        "rnn_unit": "lstm",
+        "rnn_input": 300,
+        "rnn_hidden": 250,
+        "droprate": 0.5,
+        "input_fields": ["lm", "we1", "we2", "ws"]
+    },
+    "spDecoder": {
+        "label_dict": "./dict/label_dict.json",
+        "input_dim": 500,
+        "droprate": 0.5
+    },
+    "strDecoder": {
+        "label_dict": "./dict/label_dict.json"
+    }
+}
