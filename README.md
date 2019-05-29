@@ -26,3 +26,8 @@ bash train.sh /data
 ```
 bash test.sh /data /wdata/solution.csv
 ```
+
+# Reference
+```
+Liyuan Liu, Jingbo Shang and Jiawei Han. “Arabic Named Entity Recognition: What Works and What’s Next” in Proc.of the 4th Arabic Natural Language Processing Worksho (WANLP 2019), co-located with ACL 2019, Florence, Italy, July2019.
+```
