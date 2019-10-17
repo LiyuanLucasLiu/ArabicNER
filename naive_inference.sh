@@ -1,7 +1,7 @@
 green=`tput setaf 2`
 reset=`tput sgr0`
 
-INPUT_FOLDER=$1
+INPUT_FILE=$1
 OUTPUT_FOLDER="/wdata"
 OUTPUT_FILE=$2
 DEVICE=${3:-auto}
@@ -15,13 +15,7 @@ if [ ! -e $OUTPUT_FOLDER/sner0 ]; then
 fi
 
 echo ${green}=== Data Pre-processing ===${reset}
-python pre_process_test.py --dev_file_input ${INPUT_FOLDER}/dev.txt --dev_file_output ${OUTPUT_FOLDER}/dev.json --test_file_input ${INPUT_FOLDER}/test.txt --test_file_output ${OUTPUT_FOLDER}/test.json --config ./config/sner0.json
+python naive_pre_process.py --file_input ${INPUT_FILE} --file_output ${OUTPUT_FOLDER}/tmp_output.json --config ./config/sner0.json
 
 echo ${green}=== Model Ensembling and Inferencing ===${reset}
-python ensemble_ner.py -o ${OUTPUT_FOLDER}/tmp0.csv --cp_root ${OUTPUT_FOLDER} -i ${OUTPUT_FOLDER}/dev.json ${OUTPUT_FOLDER}/test.json --gpu ${DEVICE}
-
-echo ${green}=== Dictionary Based Model Inferencing ===${reset}
-python post_process/int_dictionary.py --dict_input ${OUTPUT_FOLDER}/train_dict.json --raw_dev ${INPUT_FOLDER}/dev.txt --raw_test ${INPUT_FOLDER}/test.txt --csv_output ${OUTPUT_FOLDER}/tmp1.csv
-
-echo ${green}=== Results Merging ===${reset}
-python post_process/merge_result.py --model_csv ${OUTPUT_FOLDER}/tmp0.csv --dict_csv ${OUTPUT_FOLDER}/tmp1.csv --csv_output ${OUTPUT_FILE}
+python ensemble_ner.py -o ${OUTPUT_FOLDER}/naive_output.csv --cp_root ${OUTPUT_FOLDER} -i ${OUTPUT_FOLDER}/tmp_output.json --config_list ./config/sner0.json -n ${INPUT_FILE} --gpu ${DEVICE}

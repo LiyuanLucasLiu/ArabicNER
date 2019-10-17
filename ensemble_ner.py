@@ -34,8 +34,8 @@ if __name__ == "__main__":
     if gpu_index >= 0:
         torch.cuda.set_device(gpu_index)
 
+    dev_data, test_data = None, None
     with torch.no_grad():
-        dev_data, test_data = None, None
 
         for config_file in conf.config_list:
             with open(config_file, 'r') as fin:
@@ -45,10 +45,13 @@ if __name__ == "__main__":
 
                 logger.info('Loading the data...')
                 args['strEncoder'] = {k: v for k, v in args['strEncoder'].items() if k != 'label'}
-                dev_data = strFromFileEncoderWrapper(args, processed_file = conf.input[0])
-                test_data = strFromFileEncoderWrapper(args, processed_file = conf.input[1])
-                dev_data = [tup for tup in dev_data.get_tqdm(device, args['batch_size'], shuffle = False)]
-                test_data = [tup for tup in test_data.get_tqdm(device, args['batch_size'], shuffle = False)]
+                if len(conf.input) > 0:
+                    dev_data = strFromFileEncoderWrapper(args, processed_file = conf.input[0])
+                    dev_data = [tup for tup in dev_data.get_tqdm(device, args['batch_size'], shuffle = False)]
+                
+                if len(conf.input) > 1:
+                    test_data = strFromFileEncoderWrapper(args, processed_file = conf.input[1])
+                    test_data = [tup for tup in test_data.get_tqdm(device, args['batch_size'], shuffle = False)]
 
             logger.info("Model: {}".format(args['checkpoint_name']))
             logger.info("Config: {}".format(args))
@@ -65,25 +68,30 @@ if __name__ == "__main__":
             model.eval()
             ensembledModel = ensembledSeqLabel(model)
 
-            for x, _ in dev_data:
-                ensembledModel.ensemble(x)
+            if dev_data is not None:
+                for x, _ in dev_data:
+                    ensembledModel.ensemble(x)
 
-            for x, _ in test_data:
-                ensembledModel.ensemble(x)
+            if test_data is not None:
+                for x, _ in test_data:
+                    ensembledModel.ensemble(x)
 
             model.cpu()
 
         logger.info('Ensemble completed')
         
-        dev_output = ensembledModel.decode(dev_data, conf.name[0])
+        if dev_data is not None:
+            dev_output = ensembledModel.decode(dev_data, conf.name[0])
+            dev_output = rank_by_number(dev_output)
 
-        dev_output = rank_by_number(dev_output)
-
-        test_output = ensembledModel.decode(test_data, conf.name[1])
-
-        test_output = rank_by_number(test_output)
+        if test_data is not None:
+            test_output = ensembledModel.decode(test_data, conf.name[1])
+            test_output = rank_by_number(test_output)
         
     with codecs.open(conf.output, 'w', 'utf-8') as fout:
         fout.write('Filename,Start,End,Type,Score,Surface\n')
-        fout.write(dev_output+'\n')
-        fout.write(test_output)
+        if dev_data is not None:
+            fout.write(dev_output+'\n')
+            
+        if test_data is not None:
+            fout.write(test_output)
