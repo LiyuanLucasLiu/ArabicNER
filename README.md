@@ -30,7 +30,7 @@ bash test.sh /data /wdata/solution.csv auto
 
 Or, using the following command to use a single model (changing `auto` to `-1` to use CPU):
 ```
-bash test.sh /data /wdata/solution.csv auto
+bash naive_inference.sh /data /wdata/solution.csv auto
 ```
 
 # Reference
