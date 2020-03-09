@@ -156,7 +156,7 @@ class strWERealTimePipeline(strPipeline):
         vocab_size = 0
         self.unk_index = -1
         with codecs.open(arg['emb_path'], 'r', 'utf-8') as f:
-            for line in f.readlines():
+            for line in f:
                 line = line.split()
                 if len(line) == 2:
                     continue # vocab_size, emb_size
