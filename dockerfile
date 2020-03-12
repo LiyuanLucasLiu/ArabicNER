@@ -15,6 +15,8 @@ COPY pre_process_test.py pre_process_test.py
 COPY ensemble_ner.py ensemble_ner.py
 COPY train.sh train.sh
 COPY test.sh test.sh
+COPY naive_inference.sh naive_inference.sh
+COPY ensemble_ner.py ensemble_ner.py
 
 RUN  apt-get update \
   && apt-get install -y wget unzip vim
